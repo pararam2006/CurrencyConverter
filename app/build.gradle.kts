@@ -63,7 +63,8 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
-    implementation(libs.androidx.navigation.compose.jvmstubs)
+//    implementation(libs.androidx.navigation.compose.jvmstubs)
+    implementation (libs.androidx.navigation.compose)
 //    testImplementation(libs.junit)
 //    testImplementation(libs.testng)
 //    testImplementation(libs.junit.junit)
@@ -108,11 +109,11 @@ dependencies {
 
     // kaspresso
     androidTestImplementation("com.kaspersky.android-components:kaspresso:1.5.1")
-    androidTestUtil("androidx.test:orchestrator:1.4.2")
+    androidTestUtil(libs.androidx.orchestrator)
 
     // test
-    testImplementation("org.mockito:mockito-core:5.18.0")
-    testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.6.0")
+    testImplementation(libs.mockito.core)
+    testImplementation(libs.mockito.kotlin)
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
 }

@@ -2,9 +2,14 @@ package com.example.currencyconverter.ui.screens
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavController
+import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
-fun TradingScreen(navController: NavController, modifier: Modifier = Modifier) {
+fun TradingScreen(modifier: Modifier = Modifier) {
 
+}
+@Preview
+@Composable
+fun TradingScreenPreview() {
+    TradingScreen()
 }
