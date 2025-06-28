@@ -17,7 +17,7 @@ android {
     defaultConfig {
         applicationId = "com.example.currencyconverter"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -65,13 +65,12 @@ dependencies {
     implementation(libs.androidx.constraintlayout)
 //    implementation(libs.androidx.navigation.compose.jvmstubs)
     implementation (libs.androidx.navigation.compose)
-//    testImplementation(libs.junit)
 //    testImplementation(libs.testng)
 //    testImplementation(libs.junit.junit)
-    androidTestImplementation(libs.androidx.junit)
+//    androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
+//    androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
@@ -105,15 +104,15 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
 
     // recycler
-    implementation(libs.androidx.recyclerview)
+//    implementation(libs.androidx.recyclerview)
 
     // kaspresso
-    androidTestImplementation("com.kaspersky.android-components:kaspresso:1.5.1")
+    androidTestImplementation(libs.kaspresso)
     androidTestUtil(libs.androidx.orchestrator)
 
     // test
-    testImplementation(libs.mockito.core)
-    testImplementation(libs.mockito.kotlin)
-    testImplementation(libs.junit)
-    testImplementation(libs.kotlinx.coroutines.test)
+//    testImplementation(libs.mockito.core)
+//    testImplementation(libs.mockito.kotlin)
+//    testImplementation(libs.junit)
+//    testImplementation(libs.kotlinx.coroutines.test)
 }

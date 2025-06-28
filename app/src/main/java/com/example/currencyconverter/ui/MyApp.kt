@@ -1,6 +1,5 @@
 package com.example.currencyconverter.ui
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,21 +17,28 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
-import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.currencyconverter.ui.screens.CurrenciesScreen
 import com.example.currencyconverter.ui.screens.TradingScreen
 import com.example.currencyconverter.ui.screens.TransactionsScreen
 import com.example.currencyconverter.ui.viewmodels.CurrenciesScreenViewModel
+import com.example.currencyconverter.ui.viewmodels.TradingScreenViewModel
+import com.example.currencyconverter.ui.viewmodels.TransactionsScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MyApp(navController: NavHostController, vm: CurrenciesScreenViewModel) {
+fun MyApp(
+        navController: NavHostController,
+        currenciesScreenViewModel: CurrenciesScreenViewModel,
+        transactionsScreenViewModel: TransactionsScreenViewModel,
+        tradingScreenViewModel: TradingScreenViewModel
+    ) {
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry.value?.destination?.route
     Scaffold(
@@ -44,7 +50,7 @@ fun MyApp(navController: NavHostController, vm: CurrenciesScreenViewModel) {
                             "currencies" -> "Валюты"
                             "trading" -> "Обмен"
                             "transactions" -> "Транзакции"
-                            else -> "Приложение"
+                            else -> "Неизвестный экран"
                         },
                         fontSize = 30.sp,
                     )
@@ -59,19 +65,48 @@ fun MyApp(navController: NavHostController, vm: CurrenciesScreenViewModel) {
                 composable("currencies") {
                     CurrenciesScreen(
                         modifier = Modifier.padding(innerPadding),
-                        vm = vm
+                        vm = currenciesScreenViewModel,
+                        navController = navController
                     )
                 }
 
                 composable("trading") {
                     TradingScreen(
                         modifier = Modifier.padding(innerPadding),
+                        vm = tradingScreenViewModel
+                    )
+                }
+
+                composable(
+//                    "trading/{currencyFrom}/{currencyTo}/{currencyFromAmount}/{currencyToAmount}",
+                    "trading/{currencyFrom}/{currencyTo}/{currencyFromAmount}",
+                    arguments = listOf(
+                        navArgument("currencyFrom") { type = NavType.StringType },
+                        navArgument("currencyTo") { type = NavType.StringType },
+                        navArgument("currencyFromAmount") { type = NavType.FloatType },
+//                        navArgument("currencyToAmount") { type = NavType.FloatType }
+                    )
+                ) { backStackEntry ->
+                    val currencyFrom = backStackEntry.arguments?.getString("currencyFrom") ?: ""
+                    val currencyTo = backStackEntry.arguments?.getString("currencyTo") ?: ""
+                    val currencyFromAmount = backStackEntry.arguments?.getFloat("currencyFromAmount")?.toDouble() ?: 1.0
+//                    val currencyToAmount = backStackEntry.arguments?.getFloat("currencyToAmount")?.toDouble() ?: 1.0
+
+                    TradingScreen(
+                        modifier = Modifier.padding(innerPadding),
+                        vm = tradingScreenViewModel,
+                        currencyFrom = currencyFrom,
+                        currencyTo = currencyTo,
+                        currencyFromAmount = currencyFromAmount,
+//                        currencyToAmount = currencyToAmount
                     )
                 }
 
                 composable("transactions") {
                     TransactionsScreen(
                         modifier = Modifier.padding(innerPadding),
+                        vm = transactionsScreenViewModel,
+                        navController = navController
                     )
                 }
             }
@@ -116,11 +151,4 @@ fun MyApp(navController: NavHostController, vm: CurrenciesScreenViewModel) {
         },
         modifier = Modifier.fillMaxSize()
     )
-}
-
-@SuppressLint("ViewModelConstructorInComposable")
-@Preview
-@Composable
-fun MyAppPreview() {
-    MyApp(navController = rememberNavController(), vm = CurrenciesScreenViewModel())
 }

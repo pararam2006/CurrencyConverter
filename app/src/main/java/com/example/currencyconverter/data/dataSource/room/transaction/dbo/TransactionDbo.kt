@@ -21,5 +21,6 @@ data class TransactionDbo (
     val fromAmount: Double,
     @ColumnInfo(name = "amount_to")
     val toAmount: Double,
+    @ColumnInfo(name = "transaction_datetime")
     val dateTime: LocalDateTime,
 )
