@@ -1,4 +1,4 @@
-package com.example.currencyconverter.ui.screens
+package com.example.currencyconverter.ui.transactions
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.currencyconverter.ui.viewmodels.TransactionsScreenViewModel
 import java.math.BigDecimal
 import java.math.RoundingMode
 

@@ -24,20 +24,20 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
-import com.example.currencyconverter.ui.screens.CurrenciesScreen
-import com.example.currencyconverter.ui.screens.TradingScreen
-import com.example.currencyconverter.ui.screens.TransactionsScreen
-import com.example.currencyconverter.ui.viewmodels.CurrenciesScreenViewModel
-import com.example.currencyconverter.ui.viewmodels.TradingScreenViewModel
-import com.example.currencyconverter.ui.viewmodels.TransactionsScreenViewModel
+import com.example.currencyconverter.ui.currency.CurrenciesScreen
+import com.example.currencyconverter.ui.trading.TradingScreen
+import com.example.currencyconverter.ui.transactions.TransactionsScreen
+import com.example.currencyconverter.ui.currency.CurrenciesScreenViewModel
+import com.example.currencyconverter.ui.trading.TradingScreenViewModel
+import com.example.currencyconverter.ui.transactions.TransactionsScreenViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MyApp(
-        navController: NavHostController,
-        currenciesScreenViewModel: CurrenciesScreenViewModel,
-        transactionsScreenViewModel: TransactionsScreenViewModel,
-        tradingScreenViewModel: TradingScreenViewModel
+    navController: NavHostController,
+    currenciesScreenViewModel: CurrenciesScreenViewModel,
+    transactionsScreenViewModel: TransactionsScreenViewModel,
+    tradingScreenViewModel: TradingScreenViewModel
     ) {
     val currentBackStackEntry = navController.currentBackStackEntryAsState()
     val currentRoute = currentBackStackEntry.value?.destination?.route
@@ -45,15 +45,17 @@ fun MyApp(
         topBar = {
             CenterAlignedTopAppBar(
                 title = {
-                    Text(
-                        text = when (currentRoute) {
-                            "currencies" -> "Валюты"
-                            "trading" -> "Обмен"
-                            "transactions" -> "Транзакции"
-                            else -> "Неизвестный экран"
-                        },
-                        fontSize = 30.sp,
-                    )
+                    if (currentRoute != null) {
+                        Text(
+                            text = when {
+                                currentRoute.startsWith("currencies") -> "Валюты"
+                                currentRoute.startsWith("trading") -> "Обмен"
+                                currentRoute.startsWith("transactions") -> "Транзакции"
+                                else -> "Неизвестный экран"
+                            },
+                            fontSize = 30.sp,
+                        )
+                    }
                 },
             )
         },

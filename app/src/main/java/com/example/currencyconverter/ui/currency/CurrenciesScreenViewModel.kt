@@ -1,4 +1,4 @@
-package com.example.currencyconverter.ui.viewmodels
+package com.example.currencyconverter.ui.currency
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,10 +8,13 @@ import com.example.currencyconverter.data.dataSource.remote.dto.RateDto
 import com.example.currencyconverter.data.dataSource.room.account.dbo.AccountDbo
 import com.example.currencyconverter.data.repository.AccountRepository
 import com.example.currencyconverter.domain.entity.Currency
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CurrenciesScreenViewModel(
     private val repository: AccountRepository
@@ -23,10 +26,10 @@ class CurrenciesScreenViewModel(
     val rates: StateFlow<List<RateDto>> = _rates
 
     private val _isLoading = MutableStateFlow(true)
-    val isLoading: StateFlow<Boolean> = _isLoading
+    val isLoading: StateFlow<Boolean> = _isLoading.asStateFlow()
 
     private val ratesService = RemoteRatesServiceImpl()
-    private var _selectedCurrency = Currency.EUR.name
+    private var _selectedCurrency = Currency.RUB.name
     var selectedCurrency: String
         get() = _selectedCurrency
         set(value) {
@@ -60,8 +63,11 @@ class CurrenciesScreenViewModel(
     private suspend fun loadInitialData() {
         _isLoading.value = true
         try {
-            val loadedAccounts = repository.getAllAccounts() // Начальная загрузка для быстрого старта
-            _accounts.value = loadedAccounts
+            withContext(Dispatchers.IO) {
+                val loadedAccounts =
+                    repository.getAllAccounts() // Начальная загрузка для быстрого старта
+                _accounts.value = loadedAccounts
+            }
         } finally {
             _isLoading.value = false
         }

@@ -1,4 +1,4 @@
-package com.example.currencyconverter.ui.viewmodels
+package com.example.currencyconverter.ui.currency
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -12,11 +12,11 @@ import com.example.currencyconverter.data.dataSource.room.AppDatabase
 import com.example.currencyconverter.data.dataSource.room.account.dbo.AccountDbo
 import com.example.currencyconverter.data.repository.AccountRepository
 import com.example.currencyconverter.data.repository.TransactionRepository
-import com.example.currencyconverter.ui.viewmodels.CurrenciesScreenViewModel
-import com.example.currencyconverter.ui.viewmodels.CurrenciesScreenViewModelFactory
-import com.example.currencyconverter.ui.viewmodels.TradingScreenViewModel
-import com.example.currencyconverter.ui.viewmodels.TransactionsScreenViewModel
-import com.example.currencyconverter.ui.viewmodels.TransactionsViewModelFactory
+import com.example.currencyconverter.ui.currency.CurrenciesScreenViewModel
+import com.example.currencyconverter.ui.currency.CurrenciesScreenViewModelFactory
+import com.example.currencyconverter.ui.trading.TradingScreenViewModel
+import com.example.currencyconverter.ui.transactions.TransactionsScreenViewModel
+import com.example.currencyconverter.ui.transactions.TransactionsViewModelFactory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
