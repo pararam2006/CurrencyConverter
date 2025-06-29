@@ -1,9 +1,23 @@
 package com.example.currencyconverter.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.currencyconverter.R
+import com.example.currencyconverter.data.dataSource.room.account.dbo.AccountDbo
+import com.example.currencyconverter.data.dataSource.room.transaction.dbo.TransactionDbo
+import com.example.currencyconverter.data.repository.AccountRepository
+import com.example.currencyconverter.data.repository.TransactionRepository
+import com.example.currencyconverter.data.manager.CurrencyRatesManager
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.time.LocalDateTime
 
-class TradingScreenViewModel: ViewModel() {
+class TradingScreenViewModel : ViewModel() {
+    private lateinit var accountRepository: AccountRepository
+    private lateinit var transactionRepository: TransactionRepository
     private var _currencyFrom = ""
     var currencyFrom: String
         get() = _currencyFrom
@@ -17,7 +31,7 @@ class TradingScreenViewModel: ViewModel() {
         set(value) {
             _amountFrom = value
         }
-    
+
     private var _currencyTo = ""
     var currencyTo: String
         get() = _currencyTo
@@ -32,12 +46,61 @@ class TradingScreenViewModel: ViewModel() {
             _amountTo = value
         }
 
+    private val _balances = MutableStateFlow<Map<String, Double>>(emptyMap())
+    val balances: StateFlow<Map<String, Double>> = _balances
+
+    fun initialize(accountRepository: AccountRepository, transactionRepository: TransactionRepository) {
+        this.accountRepository = accountRepository
+        this.transactionRepository = transactionRepository
+        loadBalances()
+    }
+
+    private fun loadBalances() {
+        viewModelScope.launch {
+            val accounts = accountRepository.getAllAccounts()
+            _balances.value = accounts.associate { it.code to it.amount }
+        }
+    }
+
+    fun getRate(from: String, to: String): Double? {
+        return CurrencyRatesManager.getRate(from, to)
+    }
+
+    fun getBalance(currency: String): Double {
+        return balances.value[currency] ?: 0.0 // Безопасный доступ к балансу
+    }
+
     fun trade() {
-        //todo: Изменить записи в таблице accounts и создать запись в таблице transactions
+        viewModelScope.launch {
+            val fromAccount = accountRepository.getAllAccounts().find { it.code == currencyFrom }
+            val toAccount = accountRepository.getAllAccounts().find { it.code == currencyTo }
+
+            if (fromAccount != null && fromAccount.amount >= amountFrom) {
+                val newFromAmount = fromAccount.amount - amountFrom
+                val newToAmount = (toAccount?.amount ?: 0.0) + amountTo
+
+                accountRepository.insertAllAccounts(
+                    AccountDbo(code = currencyFrom, amount = BigDecimal(newFromAmount).setScale(5, RoundingMode.HALF_EVEN).toDouble()),
+                    AccountDbo(code = currencyTo, amount = BigDecimal(newToAmount).setScale(5, RoundingMode.HALF_EVEN).toDouble())
+                )
+
+                val rate = CurrencyRatesManager.getRate(currencyFrom, currencyTo) ?: 1.0
+                val transaction = TransactionDbo(
+                    id = 0,
+                    from = currencyFrom,
+                    to = currencyTo,
+                    fromAmount = amountFrom,
+                    toAmount = amountTo,
+                    dateTime = LocalDateTime.now()
+                )
+                transactionRepository.insertAllTransactions(transaction)
+                loadBalances() // Обновляем балансы после обмена
+            }
+        }
     }
 
     fun getCountryIcon(currency: String): Int {
-        when(currency) {
+        when (currency) {
             "USD" -> return R.drawable.icon_united_states
             "GBP" -> return R.drawable.icon_united_kingdom
             "EUR" -> return R.drawable.icon_european_union
@@ -75,47 +138,8 @@ class TradingScreenViewModel: ViewModel() {
         }
     }
 
-    fun getCurrencySymbol(currency: String): String {
-        when(currency) {
-            "USD" -> return "\$"
-            "GBP" -> return "£"
-            "EUR" -> return "€"
-            "AUD" -> return "AU\$"
-            "BGN" -> return ""
-            "BRL" -> return "R\$"
-            "CAD" -> return "\$"
-            "CHF" -> return "Fr"
-            "CNY" -> return "¥"
-            "CZK" -> return "Kč"
-            "DKK" -> return "Kr"
-            "HKD" -> return "HK\$"
-            "HRK" -> return "Kn"
-            "HUF" -> return "Ft"
-            "IDR" -> return "Rs"
-            "ILS" -> return "₪"
-            "INR" -> return "₹"
-            "ISK" -> return "kr"
-            "JPY" -> return "¥"
-            "KRW" -> return "₩"
-            "MXN" -> return "\$"
-            "MYR" -> return "RM"
-            "NOK" -> return "NKr"
-            "NZD" -> return "\$"
-            "PHP" -> return "₱"
-            "PLN" -> return "zł"
-            "RON" -> return "L"
-            "RUB" -> return "₽"
-            "SEK" -> return "kr"
-            "SGD" -> return "S\$"
-            "THB" -> return "฿"
-            "TRY" -> return "₺"
-            "ZAR" -> return "R"
-            else -> return "Unknown"
-        }
-    }
-
     fun getCurrencyFullName(currency: String): String {
-        when(currency) {
+        when (currency) {
             "USD" -> return "US Dollar"
             "GBP" -> return "Great Britain Pound"
             "EUR" -> return "Euro"
@@ -150,6 +174,45 @@ class TradingScreenViewModel: ViewModel() {
             "TRY" -> return "Turkish Lira"
             "ZAR" -> return "South African Rand"
             else -> return "Unknown currency"
+        }
+    }
+
+    fun getCurrencySymbol(currency: String): String {
+        when (currency) {
+            "USD" -> return "\$"
+            "GBP" -> return "£"
+            "EUR" -> return "€"
+            "AUD" -> return "AU\$"
+            "BGN" -> return ""
+            "BRL" -> return "R\$"
+            "CAD" -> return "\$"
+            "CHF" -> return "Fr"
+            "CNY" -> return "¥"
+            "CZK" -> return "Kč"
+            "DKK" -> return "Kr"
+            "HKD" -> return "HK\$"
+            "HRK" -> return "Kn"
+            "HUF" -> return "Ft"
+            "IDR" -> return "Rs"
+            "ILS" -> return "₪"
+            "INR" -> return "₹"
+            "ISK" -> return "kr"
+            "JPY" -> return "¥"
+            "KRW" -> return "₩"
+            "MXN" -> return "\$"
+            "MYR" -> return "RM"
+            "NOK" -> return "NKr"
+            "NZD" -> return "\$"
+            "PHP" -> return "₱"
+            "PLN" -> return "zł"
+            "RON" -> return "L"
+            "RUB" -> return "₽"
+            "SEK" -> return "kr"
+            "SGD" -> return "S\$"
+            "THB" -> return "฿"
+            "TRY" -> return "₺"
+            "ZAR" -> return "R"
+            else -> return "Unknown"
         }
     }
 }

@@ -73,7 +73,8 @@ fun MyApp(
                 composable("trading") {
                     TradingScreen(
                         modifier = Modifier.padding(innerPadding),
-                        vm = tradingScreenViewModel
+                        vm = tradingScreenViewModel,
+                        navController = navController
                     )
                 }
 
@@ -98,7 +99,8 @@ fun MyApp(
                         currencyFrom = currencyFrom,
                         currencyTo = currencyTo,
                         currencyFromAmount = currencyFromAmount,
-//                        currencyToAmount = currencyToAmount
+//                        currencyToAmount = currencyToAmount,
+                        navController = navController
                     )
                 }
 
